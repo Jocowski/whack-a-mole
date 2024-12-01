@@ -1,19 +1,71 @@
-.grid {
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+}
+
+h1 {
+    margin-top: 20px;
+    color: #333;
+}
+
+h2 {
+    margin: 10px 0;
+    color: #555;
+}
+
+#game-container {
     display: flex;
-    flex-flow: row wrap;
     justify-content: center;
-    align-content: center;
-    width: 620px;
-    height: 620px;
+    margin: 20px auto;
+}
+
+.grid {
+    display: grid;
+    gap: 5px;
+    max-width: 600px;
+    max-height: 600px;
+    width: 90%;
+    aspect-ratio: 1;
 }
 
 .square {
-    width: 200px;
-    height: 200px;
-    border: 1px solid black;
+    background-color: #ddd;
+    border: 2px solid #aaa;
+    position: relative;
+    cursor: pointer;
 }
 
 .mole {
     background-image: url("mole.png");
     background-size: cover;
+    background-position: center;
+}
+
+#restart-btn {
+    padding: 10px 20px;
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 20px;
+}
+
+#restart-btn:hover {
+    background-color: #0056b3;
+}
+
+@media (max-width: 600px) {
+    .grid {
+        max-width: 300px;
+        max-height: 300px;
+    }
+
+    .square {
+        border-width: 1px;
+    }
 }

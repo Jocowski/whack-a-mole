@@ -1,51 +1,97 @@
-const squares = document.querySelectorAll(".square");
-const mole = document.querySelector(".mole");
-const timeLeft = document.querySelector("#time-left");
-const score = document.querySelector("#score");
+const grid = document.querySelector(".grid");
+const scoreDisplay = document.querySelector("#score");
+const timeLeftDisplay = document.querySelector("#time-left");
+const restartButton = document.querySelector("#restart-btn");
 
-let result = 0;
+let score = 0;
 let currentTime = 60;
-let timer = null;
-let hitPosition;
+let hitPosition = null;
+let moleTimer = null;
+let countdownTimer = null;
+let moleSpeed = 500;
 
-function randomSquare() {
+// Generate dynamic grid
+function createGrid(size = 3) {
+    grid.innerHTML = ""; // Clear any existing squares
+    grid.style.gridTemplateColumns = `repeat(${size}, 1fr)`;
+    grid.style.gridTemplateRows = `repeat(${size}, 1fr)`;
 
-    squares.forEach(function(square) {
-        square.classList.remove("mole");
-    });
+    for (let i = 1; i <= size * size; i++) {
+        const square = document.createElement("div");
+        square.classList.add("square");
+        square.setAttribute("id", i);
+        grid.appendChild(square);
 
-    let randomPosition = squares[Math.floor(Math.random() * 9)];
-    randomPosition.classList.add("mole");
-
-    hitPosition = randomPosition.id;
-}
-
-squares.forEach(function(square) {
-    square.addEventListener("mousedown", function() {
-        if (square.id === hitPosition) {
-            result++
-            score.textContent = result;
-            hitPosition = null;
-            square.classList.remove("mole");
-        }
-    });
-});
-
-function moveMole() {
-    timer = setInterval(randomSquare, 500);
-}
-
-moveMole();
-
-function countDown() {
-    currentTime--;
-    timeLeft.textContent = currentTime;
-
-    if (currentTime === 0) {
-        clearInterval(countDownTimer);
-        clearInterval(timer);
-        alert("Game Over! You score is " + result);
+        square.addEventListener("mousedown", () => {
+            if (square.id === hitPosition) {
+                score++;
+                scoreDisplay.textContent = score;
+                hitPosition = null;
+                square.classList.remove("mole");
+            }
+        });
     }
 }
 
-let countDownTimer = setInterval(countDown, 1000);
+// Randomly place the mole
+function randomSquare() {
+    const squares = document.querySelectorAll(".square");
+    squares.forEach(square => square.classList.remove("mole"));
+
+    const randomSquare = squares[Math.floor(Math.random() * squares.length)];
+    randomSquare.classList.add("mole");
+    hitPosition = randomSquare.id;
+}
+
+// Move the mole
+function moveMole() {
+    moleTimer = setInterval(() => {
+        randomSquare();
+
+        // Adjust mole speed as time decreases
+        if (currentTime <= 40 && currentTime > 20) {
+            clearInterval(moleTimer);
+            moleSpeed = 400;
+            moveMole();
+        } else if (currentTime <= 20) {
+            clearInterval(moleTimer);
+            moleSpeed = 300;
+            moveMole();
+        }
+    }, moleSpeed);
+}
+
+// Countdown timer
+function startCountdown() {
+    countdownTimer = setInterval(() => {
+        currentTime--;
+        timeLeftDisplay.textContent = currentTime;
+
+        if (currentTime <= 0) {
+            clearInterval(countdownTimer);
+            clearInterval(moleTimer);
+            alert(`Game Over! Your score is ${score}`);
+        }
+    }, 1000);
+}
+
+// Start/restart the game
+function startGame() {
+    score = 0;
+    currentTime = 60;
+    moleSpeed = 500;
+    scoreDisplay.textContent = score;
+    timeLeftDisplay.textContent = currentTime;
+
+    clearInterval(moleTimer);
+    clearInterval(countdownTimer);
+
+    createGrid();
+    moveMole();
+    startCountdown();
+}
+
+// Event listener for restart button
+restartButton.addEventListener("click", startGame);
+
+startGame();
